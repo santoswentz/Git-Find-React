@@ -81,9 +81,24 @@ hr {
     border: 0.5px solid #565656;
     margin: 20px 0;
 }
+ 
+.start-message {
+  color: #a0a0a0;
+  margin-top: 15px;
+  font-size: 1rem;
+  text-align: start;
+}
+
+.loading-message {
+  color: #007bff;
+  margin-top: 15px;
+  font-weight: 600;
+  text-align: start;
+}
 
 .error-message {
   color: #ff4d4d;
-  margin-top: 10px;
+  margin-top: 15px;
   font-weight: bold;
+  text-align: start;
 }

@@ -9,17 +9,22 @@ function App() {
   const [user, setUser] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [repositories, setRepositories] = useState([]);
-  const [error, setError] = useState(null); // ← novo estado
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // ← loader
+  const [hasSearched, setHasSearched] = useState(false); // ← controle para mensagem inicial
 
   const handleGetData = async () => {
     if (!user.trim()) {
       setError('Digite um nome de usuário.');
       setCurrentUser(null);
       setRepositories([]);
+      setHasSearched(true);
       return;
     }
 
-    setError(null); // limpa erro anterior
+    setError(null);
+    setLoading(true);
+    setHasSearched(true);
 
     try {
       const userData = await fetch(`https://api.github.com/users/${user}`);
@@ -45,6 +50,8 @@ function App() {
       setError(err.message);
       setCurrentUser(null);
       setRepositories([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,10 +72,19 @@ function App() {
           /> 
           <button onClick={handleGetData}>Search</button> 
 
-          {/* Exibe mensagem de erro */}
+          {/* Mensagem inicial */}
+          {!hasSearched && (
+            <p className="start-message">🔍 Comece pesquisando um usuário do GitHub acima.</p>
+          )}
+
+          {/* Loader */}
+          {loading && <p className="loading-message">⏳ Carregando...</p>}
+
+          {/* Mensagem de erro */}
           {error && <p className="error-message">{error}</p>}
 
-          {currentUser?.name && (
+          {/* Perfil */}
+          {currentUser?.name && !loading && (
             <div className="profile-section"> 
               <img src={currentUser.avatar_url} alt="User Avatar" />
               <div className="user-details">
@@ -79,7 +95,8 @@ function App() {
             </div>
           )}
 
-          {repositories?.length > 0 && (
+          {/* Repositórios */}
+          {repositories?.length > 0 && !loading && (
             <div className="repositories-section">
               <hr />
               <h4>Repositories</h4>
