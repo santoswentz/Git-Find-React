@@ -12,11 +12,27 @@ function App() {
 
   const handleGetData = async () => {
     // Implement search functionality here
-    const userData = await fetch('https://api.github.com/users/' + user);
+    const userData = await fetch(`https://api.github.com/users/${user}`);
     const newUser = await userData.json();
 
     console.log(newUser);
+
+    if (newUser.name) {
+      const { avatar_url, bio, name, login } = newUser;
+      setCurrentUser({avatar_url, bio, name, login});
+
+      const reposData = await fetch(`https://api.github.com/users/${user}/repos`);
+      const newRepos = await reposData.json();
+
+      if (newRepos.length) {
+        const { name, description } = newRepos[0];
+        setRepositories(newRepos);
+        console.log(newRepos);
+      } else {
+        setRepositories([]);
+      }
   }
+}
 
   return (
     <div className="App">  
@@ -28,21 +44,30 @@ function App() {
           <div className="text-content">
             <input type="text" placeholder="Search GitHub repositories..." name='usuario' value={user} onChange={(e) => setUser(e.target.value)} /> 
             <button onClick={handleGetData}>Search</button> 
+
+            {currentUser?.name ? ( 
+              <>
               <div className="profile-section"> 
-                  <img src="https://avatars.githubusercontent.com/u/134004996?s=400&u=3d680ee2b8cb947fc737ff506c491d117f182cf3&v=4" alt="User Avatar"   />
+                  <img src={currentUser?.avatar_url} alt="User Avatar"   />
                   <div className="user-details">
-                    <h2>Eduarowentz.dev</h2>
-                    <span>@santoswentz</span>
-                    <p>Dev Full-Stack com 1 ano de experiência</p>
+                    <h2>{currentUser?.name}</h2>
+                    <span>@{currentUser?.login}</span>
+                    <p>{currentUser?.bio}</p>
                   </div>
               </div>
-            <div className='repositories-section'>
-              <hr />
-              <h4>Repositories</h4>
-              <ItemList title="Item 1" description="Description for Item 1" />
-              <ItemList title="Item 2" description="Description for Item 2" />
-              <ItemList title="Item 3" description="Description for Item 3" />
-            </div>
+              </>
+            ): null}
+            {repositories?.length ? (
+              <> 
+                <div className='repositories-section'>
+                  <hr />
+                  <h4>Repositories</h4>
+                  {repositories.map((repo, index) => (
+                    <ItemList key={index} title={repo.name} description={repo.description} />
+                  ))}
+                </div>
+              </>
+            ): null}
             </div>
           </div>
     </div>
